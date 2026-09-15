@@ -5,7 +5,7 @@ N = 3
 
 @dataclass(slots=True)
 class PuzzleState:
-    board: list[list[int]]
+    board: list[list[int | None]]
     x: int
     y: int
     depth: int = 0
@@ -14,14 +14,14 @@ class PuzzleState:
 row = (0, 0, -1, 1)
 col = (-1, 1, 0, 0)
 
-def is_goal_state(board: list[list[int]]) -> bool:
-    goal = [[1, 2, 3], [4, 5, 6], [7, 8, 0]]
+def is_goal_state(board: list[list[int | None]]) -> bool:
+    goal = [[1, 2, 3], [4, 5, 6], [7, 8, None]]
     return board == goal
 
 def is_valid(x: int, y: int) -> bool:
     return 0 <= x < N and 0 <= y < N
 
-def print_board(board: list[list[int]]) -> None:
+def print_board(board: list[list[int | None]]) -> None:
     for r in board:
         print(' '.join(map(str, r)))
     print('--------')
@@ -35,8 +35,7 @@ def print_path(curr: PuzzleState | None) -> None:
         print(f'Depth: {state.depth}')
         print_board(state.board)
 
-def solve_puzzle_bfs(start: list[list[int]], x: int, y: int) -> tuple[PuzzleState | None, int]:
-    q = deque([PuzzleState(start, x, y, 0)])
+def solve_puzzle_bfs(start: list[list[int | None]], x: int, y: int) -> tuple[PuzzleState | None, int]:
     q = deque([PuzzleState(start, x, y, 0)])
     visited = {tuple(map(tuple, start))}
     iterations = 0
