@@ -7,7 +7,14 @@ if __name__ == '__main__':
     #filename = "data/input-Ex1/Ex1-1.txt"
     filename = str(input("Nom du fichier (relatif) : "))
     
-    lines_matrix, x, y = parse_puzzle_file(filename)
+    parsed = parse_puzzle_file(filename)
+
+    # Gestion des erreurs de parsing
+    if parsed is False:
+        print("Erreur lors de l'analyse du fichier. Veuillez vérifier le format.")
+        exit(1)
+
+    lines_matrix, x, y = parsed
 
     print('Initial State loaded from file:')
     print_board(lines_matrix)
