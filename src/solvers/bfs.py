@@ -1,39 +1,7 @@
 from collections import deque
-from dataclasses import dataclass, field
 
-N = 3
-
-@dataclass(slots=True)
-class PuzzleState:
-    board: list[list[int | None]]
-    x: int
-    y: int
-    depth: int = 0
-    parent: 'PuzzleState | None' = None
-
-row = (0, 0, -1, 1)
-col = (-1, 1, 0, 0)
-
-def is_goal_state(board: list[list[int | None]]) -> bool:
-    goal = [[1, 2, 3], [4, 5, 6], [7, 8, None]]
-    return board == goal
-
-def is_valid(x: int, y: int) -> bool:
-    return 0 <= x < N and 0 <= y < N
-
-def print_board(board: list[list[int | None]]) -> None:
-    for r in board:
-        print(' '.join(map(str, r)))
-    print('--------')
-
-def print_path(curr: PuzzleState | None) -> None:
-    path = []
-    while curr:
-        path.append(curr)
-        curr = curr.parent
-    for state in reversed(path):
-        print(f'Depth: {state.depth}')
-        print_board(state.board)
+# import des fonctions communes nécessaires à BFS
+from .commun import PuzzleState, is_goal_state, is_valid, print_board, print_path, row, col
 
 def solve_puzzle_bfs(start: list[list[int | None]], x: int, y: int) -> tuple[PuzzleState | None, int]:
     q = deque([PuzzleState(start, x, y, 0)])
