@@ -1,6 +1,14 @@
 # fichier qui contient les fonctions communes aux différents algos
 from dataclasses import dataclass
 
+# actions selon le déplacement (x,y) de notre référence (case vide ou autre) 
+ACTION= {
+    (0, -1): "Gauche",
+    (0, 1): "Droite",
+    (-1, 0): "Haut",
+    (1, 0): "Bas"
+}
+
 N = 3
 
 # Structure pour stocker un état du puzzle
@@ -36,3 +44,21 @@ def print_path(curr: PuzzleState | None) -> None:
     for state in reversed(path):
         print(f'Depth: {state.depth}')
         print_board(state.board)
+
+def get_actions(state: PuzzleState) -> list[str]:
+    actions = []
+
+    # remonte les parents
+    while state.parent:
+        dx = state.x - state.parent.x
+        dy = state.y - state.parent.y
+
+        # ajoute l'action à la liste
+        actions.append(ACTION[(dx, dy)])
+
+        # jusqu'à l'état parent
+        state = state.parent
+    
+    # pour avoir les actions dans l'ordre de départ à l'arrivée
+    actions.reverse()  
+    return actions

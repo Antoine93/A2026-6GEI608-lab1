@@ -1,18 +1,31 @@
 import time
 
-from src.utils import parse_puzzle_file
-from src.solvers import solve_puzzle_bfs, print_board, print_path
+from src.utils import parse_puzzle_file, write_run_file, output_path
+from src.solvers import solve_puzzle_bfs, solve_puzzle_dfs, print_board, print_path, get_actions
+
+# ajout d'un dictionnaire pour mapper les algorithmes aux fonctions correspondantes
+SOLVERS = {
+    "bfs": solve_puzzle_bfs,
+    "dfs": solve_puzzle_dfs
+    # IDS sous peu...
+}
 
 if __name__ == '__main__':
     #filename = "data/input-Ex1/Ex1-1.txt"
     filename = str(input("Nom du fichier (relatif) : "))
-    
     parsed = parse_puzzle_file(filename)
-
     # Gestion des erreurs de parsing
     if parsed is False:
         print("Erreur lors de l'analyse du fichier. Veuillez vérifier le format.")
         exit(1)
+
+    # demander à l'utilisateur quel algorithme utiliser
+    algo = input("Algorithme à utiliser (bfs, dfs, ids) : ").strip().lower()
+    if algo not in SOLVERS:
+        print(f" '{algo}' non reconnu. Veuillez choisir parmi : {', '.join(SOLVERS.keys())}.")
+        exit(1)
+
+    solve = SOLVERS[algo]
 
     lines_matrix, x, y = parsed
 
@@ -28,23 +41,28 @@ if __name__ == '__main__':
     print(f"Exécution de la recherche {N_RUNS} fois pour calcul de la moyenne...")
 
     # Boucle de benchmarking
-    for _ in range(N_RUNS):
+    for run in range(1, N_RUNS + 1):
         start_time = time.perf_counter()
-
-        # en attendant le formattage de output afin d'avoir la même interface pour BFS et DFS
-        result, iterations, _ = solve_puzzle_bfs(lines_matrix, x, y)
+        result, iterations, frontier_sizes = solve(lines_matrix, x, y)
         end_time = time.perf_counter()
         total_time += (end_time - start_time)
 
+        path = output_path("results", algo, filename, run)
+        write_run_file(path, frontier_sizes, iterations, end_time - start_time)
+
     average_time = total_time / N_RUNS
+    print(f"Temps d'exécution moyen sur {N_RUNS} essais : {average_time:.6f} secondes")
 
     # Affichage des résultats après la série de mesures
     if result:
-        print('Chemin vers la solution :')
-        print_path(result)
-        print(f'État objectif atteint à la distance {result.depth}')
-        print(f"Total d'itérations (états dépilés) : {iterations}\n")
+        actions = get_actions(result)
+
+        print(f"Goal state atteint :")
+        print_board(result.board)
+
+        print(f'Distance : {len(actions)}')
+        # print(f"Actions pour atteindre l'état objectif : {actions}")
+        print(f"Nombre total d'itérations (états dépilés) : {iterations}\n")
     else:
         print(f"Aucune solution trouvée ({iterations} itérations vérifiées)")
 
-    print(f"Temps d'exécution moyen sur {N_RUNS} essais : {average_time:.6f} secondes")
