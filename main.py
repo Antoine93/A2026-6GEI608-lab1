@@ -1,7 +1,7 @@
 import time
 
-from utils import parse_puzzle_file
-from solvers import solve_puzzle_bfs, print_board, print_path
+from src.utils import parse_puzzle_file
+from src.solvers import solve_puzzle_bfs, print_board, print_path
 
 if __name__ == '__main__':
     #filename = "data/input-Ex1/Ex1-1.txt"
@@ -30,7 +30,9 @@ if __name__ == '__main__':
     # Boucle de benchmarking
     for _ in range(N_RUNS):
         start_time = time.perf_counter()
-        result, iterations = solve_puzzle_bfs(lines_matrix, x, y)
+
+        # en attendant le formattage de output afin d'avoir la même interface pour BFS et DFS
+        result, iterations, _ = solve_puzzle_bfs(lines_matrix, x, y)
         end_time = time.perf_counter()
         total_time += (end_time - start_time)
 

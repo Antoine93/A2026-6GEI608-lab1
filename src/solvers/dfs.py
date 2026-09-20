@@ -1,10 +1,11 @@
 # Fichier d'implémentation du DFS
 
 # Importation des bibliothèques nécessaires
+
 from .commun import is_goal_state, is_valid, PuzzleState, row, col
 
-# Recherche en profondeur (DFS) pour résoudre le problème du taquin (8-puzzle)
-def solve_puzzle_dfs(start, x, y):
+# Recherche en profondeur (DFS), retourne (état final ou None, nb d'états explorés, taille de la frontière à chaque itération)
+def solve_puzzle_dfs(start: list[list[int | None]], x: int, y: int) -> tuple[PuzzleState | None, int, list[int]]:
 
     # LIFO
     stack = []
@@ -14,8 +15,17 @@ def solve_puzzle_dfs(start, x, y):
     stack.append(PuzzleState(start, x, y, 0))
     visited.add(tuple(map(tuple, start)))
 
+    iterations = 0
+    frontier_sizes = []
+
     while stack:
+        # taille de la frontière à chaque itératiion avant de pop()
+        frontier_sizes.append(len(stack))
+
         curr = stack.pop()
+
+        # état est exploré au moment du pop()
+        iterations += 1
 
         # Affiche le plateau courant
         # print(f'Profondeur: {curr.depth}')
@@ -23,7 +33,7 @@ def solve_puzzle_dfs(start, x, y):
 
         # Vérifie si l'état final est atteint
         if is_goal_state(curr.board):
-            return
+            return curr, iterations, frontier_sizes
 
         # Explore les mouvements possibles
         for i in range(4):
@@ -41,4 +51,4 @@ def solve_puzzle_dfs(start, x, y):
                     visited.add(board_tuple)
                     stack.append(PuzzleState(new_board, new_x, new_y, curr.depth + 1, parent=curr))
 
-    print('Aucune solution trouvée (DFS Brute Force, limite de profondeur atteinte)')
+    return None, iterations, frontier_sizes
