@@ -1,6 +1,6 @@
 import time
 
-from src.utils import parse_puzzle_file
+from src.utils import parse_puzzle_file, write_run_file, output_path
 from src.solvers import solve_puzzle_bfs, print_board, print_path
 
 if __name__ == '__main__':
@@ -28,13 +28,14 @@ if __name__ == '__main__':
     print(f"Exécution de la recherche {N_RUNS} fois pour calcul de la moyenne...")
 
     # Boucle de benchmarking
-    for _ in range(N_RUNS):
+    for run in range(1, N_RUNS + 1):
         start_time = time.perf_counter()
-
-        # en attendant le formattage de output afin d'avoir la même interface pour BFS et DFS
-        result, iterations, _ = solve_puzzle_bfs(lines_matrix, x, y)
+        result, iterations, frontier_sizes = solve_puzzle_bfs(lines_matrix, x, y)
         end_time = time.perf_counter()
         total_time += (end_time - start_time)
+
+        path = output_path("results", "bfs", filename, run)
+        write_run_file(path, frontier_sizes, iterations, end_time - start_time)
 
     average_time = total_time / N_RUNS
 
