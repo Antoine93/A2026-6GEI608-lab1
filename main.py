@@ -1,13 +1,13 @@
 import time
 
 from src.utils import parse_puzzle_file, write_run_file, output_path
-from src.solvers import solve_puzzle_bfs, solve_puzzle_dfs, print_board, print_path, get_actions
+from src.solvers import solve_puzzle_bfs, solve_puzzle_dfs,solve_puzzle_ids, print_board, print_path, get_actions
 
 # ajout d'un dictionnaire pour mapper les algorithmes aux fonctions correspondantes
 SOLVERS = {
     "bfs": solve_puzzle_bfs,
-    "dfs": solve_puzzle_dfs
-    # IDS sous peu...
+    "dfs": solve_puzzle_dfs,
+    "ids": solve_puzzle_ids 
 }
 
 if __name__ == '__main__':
