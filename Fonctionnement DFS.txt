@@ -1,0 +1,35 @@
+FONCTIONNEMENT DE DFS (RECHERCHE EN PROFONDEUR)
+===============================================
+
+Fichiers concernés : src/solvers/dfs.py et src/solvers/commun.py
+
+DFS reprend la même base que BFS : PuzzleState, les décalages row / col, is_valid(), le tuple de tuples pour visited et la copie des lignes du plateau.
+
+
+1. LA PILE AU LIEU DE LA FILE
+------------------------------------
+
+Pour la partie initialisation :
+
+    stack = []
+    visited = set()
+    stack.append(PuzzleState(start, x, y, 0))
+    visited.add(tuple(map(tuple, start)))
+
+  -Une simple liste Python suffit comme pile : append() empile et pop() dépile le dernier élément ajouté.
+  -Il n'y a pas besoin de deque ici car on travaille toujours du même côté de la liste (la fin).
+
+Pour la boucle principale :
+
+    while stack:
+        frontier_sizes.append(len(stack))   # taille de la frontière AVANT de retirer
+        curr = stack.pop()                  # LIFO : on prend le plus récent
+        iterations += 1                     # un état est exploré au moment du retrait
+
+Tout le reste de la boucle (test du but, génération des voisins, copie du plateau, ajout dans visited) est identique à BFS. La seule différence dans le code est donc q.popleft() qui devient stack.pop().
+
+La reconstruction du chemin (get_actions) est la même que pour BFS.
+
+Il'aina R.
+UQAC
+2026-09-23
