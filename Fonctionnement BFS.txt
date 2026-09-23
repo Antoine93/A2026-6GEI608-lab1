@@ -1,0 +1,115 @@
+FONCTIONNEMENT DE BFS (RECHERCHE EN LARGEUR)
+============================================
+
+Fichiers concernés : src/solvers/bfs.py et src/solvers/commun.py
+
+Notre algorithme BFS repose sur 3 éléments :
+  -la structure d'un état (PuzzleState)
+  -la génération des voisins (row / col + fonction is_valid())
+  -la boucle while de bfs.py
+
+
+1. UN ÉTAT = PuzzleState (dans commun.py)
+------------------------------------
+    board   : matrice 3x3 (liste de listes), dans notre traitement algo None = case vide
+    x, y    : position de la case vide (mémorisée pour ne pas la rechercher à chaque fois)
+    depth   : nombre de coups depuis state initial
+    parent  : l'état d'où on vient (donc None pour l'état initial)
+
+En fait, le "parent" sert à reconstruire le chemin à la fin. On ne stocke pas le chemin complet dans chaque état :
+chaque état pointe vers son parent.
+Et aussi, il y a x et y qui viennent du parseur (parser.py), qui repère la case vide en lisant le fichier.
+
+
+2. LES MOUVEMENTS (commun.py)
+-----------------------------
+    row = (0, 0, -1, 1)
+    col = (-1, 1, 0, 0)
+
+Ce sont des décalages appliqués à (x, y) pour trouver les nouveaux états, pris ensemble à l'indice i :
+
+    i = 0 : (row, col) = ( 0, -1)  ->  la case vide va à gauche
+    i = 1 : (row, col) = ( 0, +1)  ->  la case vide va à droite
+    i = 2 : (row, col) = (-1,  0)  ->  la case vide va en haut
+    i = 3 : (row, col) = (+1,  0)  ->  la case vide va en bas
+
+"row" désigne le décalage sur la ligne (x), et "col" celui sur la
+colonne (y). is_valid(x, y) est une fonction qui vérifie que la nouvelle position reste dans la
+grille 3x3. Sinon on rejette l'`état résultant du calcul.
+
+
+3. LA BOUCLE BFS (dans bfs.py)
+-----------------------------
+
+Pour la partie initialisation :
+
+    q = deque([PuzzleState(start, x, y, 0)])
+    visited = {tuple(map(tuple, start))}
+
+  -La file q contient l'état initial (profondeur 0, sans parent).
+  -visited est un ensemble d'états déjà vus. Chaque plateau est converti en tuple de tuples car une liste de listes n'est pas hachable et ne
+    peut pas être mise dans un set. Le tuple nous a rendu le test "déjà vu ?" en temps constant et faciliter l'implémentation.
+  -tuple(map(tuple, start)) pour transformer chaque ligne en tuple, puis l'ensemble en tuple.
+
+Après ca pour la boucle principale
+
+    while q:
+        frontier_sizes.append(len(q))   # taille de la frontière AVANT de retirer
+        curr = q.popleft()              # FIFO : on prend le plus ancien
+        iterations += 1                 # un état est exploré au moment du retrait
+
+La taille de la frontière à chaque itération se mesure juste avant le popleft.
+
+Ensuite, le test du but important
+
+    if is_goal_state(curr.board):
+        return curr, iterations, frontier_sizes
+
+Par la suite, la génération des voisins
+
+    for i in range(4):
+        new_x = curr.x + row[i]
+        new_y = curr.y + col[i]
+        if is_valid(new_x, new_y):
+            new_board = [r[:] for r in curr.board]
+            new_board[curr.x][curr.y], new_board[new_x][new_y] = new_board[new_x][new_y], new_board[curr.x][curr.y]
+
+  -On essaie les 4 directions comme mentionnées en haut. Si la case vide reste dans la grille c'est a dire qui is_valid() retourne true, on
+    crée le nouvel état.
+  -La copie [r[:] for r in curr.board] est indispensable pour assurer que chaque état voisin a ses propres lignes. On peut le modifier autant qu'on
+  veut.
+  -Enfin, on échange la case vide et le voisin, ce qui représente le coup.
+
+Par après, on ajoute dans la file les nouveaux états obtenus
+
+    board_tuple = tuple(map(tuple, new_board))
+    if board_tuple not in visited:
+        visited.add(board_tuple)
+        q.append(PuzzleState(new_board, new_x, new_y, curr.depth + 1, parent=curr))
+
+  -On ajoute le voisin uniquement s'il n'a jamais été vu.
+  -On le marque visité dès l'insertion (pas au retrait). Ainsi, un même état ne peut pas être placé deux fois dans la file : pas de doublons,
+  pas de mémoire inutile.
+  - depth + 1 et parent=curr nous serviront à alimenter la reconstruction du chemin plus tard.
+
+Enfin, si la file se vide
+
+    return None, iterations, frontier_sizes
+
+Tout l'espace atteignable a été exploré sans trouver le but donc pas de
+solution.
+
+
+4. RECONSTRUIRE LE CHEMIN (commun.py)
+-----------------------------
+Une fois le but trouvé, on remonte jusqu'à state initial.
+Pour chaque étape, on calcule le déplacement de la case vide :
+    dx = state.x - state.parent.x
+    dy = state.y - state.parent.y
+
+Ce couple (dx, dy) correspond à un mot via le dictionnaire ACTION (et aussi voir section MOUVEMENTS en haut). La liste est construite à l'envers donc on la
+retourne avec reverse() à la fin. len(actions) à la fin, nous donne la distance affichée par main.py.
+
+Il'aina R.
+UQAC
+2026-09-23
