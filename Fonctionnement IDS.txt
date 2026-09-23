@@ -1,0 +1,70 @@
+FONCTIONNEMENT DE IDS (RECHERCHE À APPROFONDISSEMENT ITÉRATIF)
+==============================================================
+
+Fichiers concernés : src/solvers/ids.py et src/solvers/commun.py
+
+IDS reprend la même base que DFS (pile LIFO, pop()), donc aussi celle de BFS : PuzzleState, les décalages row / col, is_valid(), le tuple de tuples pour visited et la copie des lignes du plateau.
+Il ajoute une limite de profondeur et une boucle qui la fait augmenter.
+
+
+1. LA LIMITE ET LA BOUCLE EXTERNE
+---------------------------------
+
+Pour la partie initialisation :
+
+    iterations = 0
+    frontier_sizes = []
+    limit = 0
+
+  -limit est la profondeur maximale autorisée pour le tour courant, on commence à 0.
+  -iterations et frontier_sizes sont créés une seule fois, en dehors de la boucle : ils s'accumulent donc sur tous les tours et comptent aussi les états ré-explorés.
+
+Ensuite, chaque tour de la boucle while true refait un DFS complet depuis l'état initial :
+
+    while True:
+        stack = [PuzzleState(start, x, y, 0)]
+        visited = {tuple(map(tuple, start)):0}
+        cutoff = False
+
+  -La pile et visited sont recréés à chaque tour.
+  -cutoff indique si la limite a bloqué au moins un état pendant ce tour.
+
+
+2. LA BOUCLE INTERNE (DFS AVEC LIMITE)
+--------------------------------------
+
+Le début est identique à DFS (mesure de la frontière, pop(), iterations, test du but). Puis :
+
+    if curr.depth == limit:
+        cutoff = True
+        continue
+
+  -On ne développe pas un état qui atteint la limite : on passe au suivant avec continue et on note que la limite a coupé au moins une branche.
+  -Le test du but est fait avant ce contrôle donc un but situé exactement à la profondeur limite est bien trouvé.
+
+Pour l'ajout des voisins, la condition change par rapport à DFS :
+
+    d = curr.depth + 1
+    if board_tuple not in visited or (visited[board_tuple] > d):
+        visited[board_tuple] = d
+        stack.append(PuzzleState(new_board, new_x, new_y, d, parent=curr))
+
+  -On empile un voisin s'il est nouveau, ou s'il a déjà été vu mais à une profondeur plus grande que celle où on l'atteint maintenant.
+
+
+3. LA FIN D'UN TOUR
+-------------------
+
+    if not cutoff:
+        return None, iterations, frontier_sizes
+    limit += 1
+
+  -Si la limite n'a bloqué aucun état pendant le tour, on a exploré tout l'espace atteignable et il n'y a pas de solution : on retourne None.
+  -Sinon on augmente limit de 1 et on recommence un nouveau tour.
+  -C'est cette condition qui fait terminer IDS sur un puzzle sans solution mais seulement après avoir refait un tour complet pour chaque profondeur jusqu'à épuisement de l'espace.
+
+La reconstruction du chemin (get_actions) est la même que pour BFS.
+
+Il'aina R.
+UQAC
+2026-09-23
