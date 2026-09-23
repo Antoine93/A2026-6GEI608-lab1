@@ -1,6 +1,6 @@
 import time
 
-from src.utils import parse_puzzle_file, write_run_file, output_path
+from src.utils import parse_puzzle_file, write_run_file, output_path, is_solvable
 from src.solvers import solve_puzzle_bfs, solve_puzzle_dfs,solve_puzzle_ids, print_board, print_path, get_actions
 
 # ajout d'un dictionnaire pour mapper les algorithmes aux fonctions correspondantes
@@ -28,6 +28,11 @@ if __name__ == '__main__':
     solve = SOLVERS[algo]
 
     lines_matrix, x, y = parsed
+
+    # condition pour vérifier si le puzzle est solvable avant de lancer la recherche
+    if not is_solvable(lines_matrix):
+        print("Le 8puzzle n'est pas solvable.")
+        exit(1)
 
     print('Initial State loaded from file:')
     print_board(lines_matrix)
