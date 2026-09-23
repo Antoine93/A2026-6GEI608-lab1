@@ -10,8 +10,8 @@ def write_run_file( output_file, frontier_sizes, explored, elapsed_time):
         for i, size in enumerate(frontier_sizes, start=1):
             f.write(f"{i} \\t {size}\n")
 
-        f.write(f"nombre_global_d_états_explorés: {explored}\n")
-        f.write(f"temps d'exécution: {elapsed_time}\n")
+        f.write(f"{explored}\n")
+        f.write(f"{elapsed_time}\n")
 
 # construit le chemin complet du fichier de sortie
 def output_path(base_path, algo, input_file, run):
