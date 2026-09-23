@@ -30,6 +30,7 @@ if __name__ == '__main__':
     lines_matrix, x, y = parsed
 
     # condition pour vérifier si le puzzle est solvable avant de lancer la recherche
+    ###### mettre cette section en commentaire pour voir qu'avec bfs et dfs, on a réussi à explorer tous les états ########
     if not is_solvable(lines_matrix):
         print("Le 8puzzle n'est pas solvable.")
         exit(1)
