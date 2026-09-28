@@ -17,6 +17,30 @@ Choisir l'algorithme de recherche
 
 Taper la touche Entrer
 
+ou
+
+### Installer uv
+
+```bash
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+```bash
+# Se placer dans le dossier si ce n'est pas déjà le cas
+cd C:...\A2026-6GEI608-lab1
+
+# Synchroniser les dépendances
+uv sync # Synchronise avec le fichier toml (python 3.14 et dépendances)
+
+# Lancer le programme
+uv run main.py
+
+```
+
 
 ## Résumé 
 
@@ -92,17 +116,30 @@ IDS répète une recherche en profondeur avec une limite l qui augmente de 1 à 
 
 ## Comparaison des algorithmes
 
-**Performance.** Sur les inputs résolubles, BFS est stable : il retrouve toujours la solution optimale, en moins d'une seconde dans nos essais. DFS est le plus rapide à trouver une solution mais elle est très mauvaise car des dizaines de milliers de coups sont effectués alors qu'une solution à moins de 30 coups existe. IDS retrouve aussi la solution optimale mais explore beaucoup plus d'états à cause des ré-explorations.
+**Performance.** Sur les inputs résolubles, BFS retrouve toujours la solution optimale, en moins d'une seconde dans nos essais et le temps entre deux instances du meme problème reste similaire.
+DFS trouve également une solution sur les inputs résolubles, mais il n'y a pas de garantie d'optimalité. 
+IDS retrouve aussi la solution pour les inputs résolubles, mais explore beaucoup plus d'états à cause des ré-explorations.
+
+La disposition initiale des chiffres dans les tuiles peut avantager un algorithme par rapport à un autre, mais il s'agit du fruit du hasard. Par exemple, si le labyrinthe n'a qu'un chiffre a inverser qui se trouve à l'extrémité en largeur, l'algorithme de recherche en profondeur va mettre plus d'itérations avant de le trouver, et vice-versa pour BFS en profondeur. IDS peut avoir à recalculer des états similaires plusieurs fois parce que la solution se trouve à un niveau de profondeur inférieur. 
 
 **Mémoire.** BFS garde un niveau entier de l'arbre en mémoire et c'est son principal inconvénient. DFS et IDS ont en théorie une mémoire proportionnelle à la profondeur seulement. Sur un espace aussi petit, cette différence pèse peu en pratique.
 
-**Facilité d'implémentation.** IDS est à notre avis le plus facile à écrire "une fois le DFS fait!" car il reprend exactement sa structure, on ajoute une limite de profondeur l et une boucle externe qui l'augmente. BFS et DFS sont aussi simples, la seule différence étant la structure de données (file ou pile).
+**Facilité d'implémentation.** IDS est le plus facile à écrire une fois le DFS fait, car il reprend exactement sa structure, on ajoute une limite de profondeur l et une boucle externe qui l'augmente. BFS et DFS sont aussi simples, la seule différence étant la structure de données (file ou pile).
 
 **Remarques.** 
 
 Nous avons constaté que l'input Ex1-3.txt est irrésolvable mais bfs et dfs ont réussi à tout explorer les états en moins d'une seconde pour tirer la conclusion qu'aucune solution n'est trouvée.Cependant, ids a pris énormmément de temps qu'on s'est pas rendu à avoir les fichiers de sortie.
 
+![Launch](img/image4.png)
+
 Pour un problème de cette taille (8puzzle), BFS est le meilleur choix pratique : optimal, rapide et sans surprise. DFS convient si seule l'existence d'une solution compte. IDS devient intéressant quand l'espace est trop grand pour garder toute la frontière en mémoire. Le cas des puzzles sans solution nous a appris aussi qu'un bon algorithme ne suffit pas, une vérification simple en amont vaut mieux qu'une recherche coûteuse et vaine.
+
+## Fichiers de sorties
+Nous avons organisé les informations des fichiers de sorties comme suit (comme mentionné dans l'énoncé):
+
+- À partir de la première ligne : numéro_itération \t taille_de_frontiere
+- La ligne avant-dernière du fichier : nombre_global_d_états_explorés
+- La dernière ligne : temps d’exécution
 
 ## Références utilisées
 - « 8 puzzle Problem », GeeksforGeeks, 23 février 2025. [En ligne]. Disponible sur : https://www.geeksforgeeks.org/dsa/8-puzzle-problem-using-branch-and-bound/
